@@ -1,0 +1,35 @@
+# Build directories
+/build/
+/build-*/
+/cmake-build-*/
+
+# CMake generated files and local settings
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+CMakeUserPresets.json
+
+# Compiled objects and libraries
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.dSYM/
+
+# Code coverage data and reports
+*.gcda
+*.gcno
+*.gcov
+/coverage/
+
+# macOS metadata
+.DS_Store
