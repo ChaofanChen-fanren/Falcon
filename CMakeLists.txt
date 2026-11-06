@@ -13,6 +13,7 @@ project(falcon VERSION 0.1.0 LANGUAGES CXX C)
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+include(CTest)
 
 # Build options
 option(FALCON_BUILD_EXAMPLES "Build examples" ON)
