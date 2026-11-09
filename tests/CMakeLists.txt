@@ -11,6 +11,8 @@ if(NOT FALCON_TEST_SOURCES)
     return()
 endif()
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(URCU REQUIRED IMPORTED_TARGET liburcu)
 find_package(Threads REQUIRED)
 
 foreach(TEST_SOURCE IN LISTS FALCON_TEST_SOURCES)
@@ -23,7 +25,7 @@ foreach(TEST_SOURCE IN LISTS FALCON_TEST_SOURCES)
     add_executable("${TEST_NAME}" "${TEST_SOURCE}")
 
     target_link_libraries("${TEST_NAME}"
-        PRIVATE falcon Threads::Threads
+        PRIVATE falcon Threads::Threads PkgConfig::URCU
     )
 
     # Keep build configurations separate.
