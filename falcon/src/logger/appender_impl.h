@@ -1,8 +1,8 @@
 #ifndef FALCON_SRC_LOGGER_APPENDER_IMPL_H
 #define FALCON_SRC_LOGGER_APPENDER_IMPL_H
 
-#include <falcon/logger/appender.h>
 #include <atomic>
+#include <falcon/logger/appender.h>
 #include <mutex>
 
 namespace falcon {
@@ -23,7 +23,7 @@ class Appender::Impl {
 
   private:
     std::mutex m_mutex;
-    std::atomic<u8> m_level{static_cast<u8>(LoggerLevel::Level::LOGGER_LEVEL_DEBUG)};
+    std::atomic<LoggerLevel::Level> m_level{LoggerLevel::Level::LOGGER_LEVEL_DEBUG};
 };
 
 namespace detail {

@@ -49,11 +49,11 @@ void Appender::Impl::append(LoggerLevel::Level level, std::string_view formatted
 }
 
 void Appender::Impl::setLevel(LoggerLevel::Level level) noexcept {
-    m_level.store(static_cast<u8>(level), std::memory_order_release);
+    m_level.store(level, std::memory_order_release);
 }
 
 LoggerLevel::Level Appender::Impl::getLevel() const noexcept {
-    return static_cast<LoggerLevel::Level>(m_level.load(std::memory_order_acquire));
+    return m_level.load(std::memory_order_acquire);
 }
 
 // io buffer -> os buffer
