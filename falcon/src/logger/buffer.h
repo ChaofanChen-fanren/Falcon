@@ -97,6 +97,8 @@ template <std::size_t STACK_SIZE = 250> class InlineBuffer {
     std::string m_heap_storage;
 };
 
+// Adapts an InlineBuffer for use with std::ostream.
+// The referenced buffer must outlive this adapter.
 template <std::size_t STACK_SIZE> class InlineStreamBuffer final : public std::streambuf {
   public:
     explicit InlineStreamBuffer(InlineBuffer<STACK_SIZE> &buffer) noexcept : m_buffer(buffer) {
@@ -113,6 +115,8 @@ template <std::size_t STACK_SIZE> class InlineStreamBuffer final : public std::s
     }
 
     int_type overflow(int_type character) override {
+        // An EOF argument supplies no character to append.
+        // return a non-EOF value to report success.
         if (traits_type::eq_int_type(character, traits_type::eof())) {
             return traits_type::not_eof(character);
         }

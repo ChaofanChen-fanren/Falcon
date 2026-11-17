@@ -4,7 +4,7 @@
 #include "logger_impl.h"
 #include <chrono>
 #include <cstdarg>
-#include <falcon/logger/log_line.h>
+#include <falcon/logger/log.h>
 #include <falcon/utils/system_utils.h>
 #include <falcon/utils/thread_utils.h>
 #include <memory>
@@ -13,10 +13,9 @@ namespace falcon::detail {
 
 struct LogLine::Impl final {
     Impl(Logger &logger, LoggerLevel::Level level, u32 line, std::string_view file_name)
-        : m_logger(logger), m_level(level), m_line(line), m_fileName(file_name),
-          m_timestamp(std::chrono::system_clock::now()), m_elapsed(GetElapsedTime()), m_threadId(GetThreadId()),
-          m_fiberId(GetFiberId()), m_threadName(GetThreadName()), m_streamBuffer(m_inlineBuffer),
-          m_stream(&m_streamBuffer) {
+        : m_logger(logger), m_level(level), m_timestamp(std::chrono::system_clock::now()), m_elapsed(GetElapsedTime()),
+          m_threadId(GetThreadId()), m_fiberId(GetFiberId()), m_threadName(GetThreadName()), m_fileName(file_name),
+          m_line(line), m_streamBuffer(m_inlineBuffer), m_stream(&m_streamBuffer) {
     }
 
     [[nodiscard]] LogRecordView getRecord() const noexcept {
@@ -27,27 +26,29 @@ struct LogLine::Impl final {
     }
 
     Logger &m_logger;
+
     LoggerLevel::Level m_level;
-    u32 m_line = 0;
-    std::string_view m_fileName;
     std::chrono::system_clock::time_point m_timestamp;
     std::chrono::steady_clock::duration m_elapsed;
     u64 m_threadId = 0;
     u64 m_fiberId = 0;
     std::string_view m_threadName;
-    InlineBuffer<LOG_MESSAGE_INLINE_CAPACITY> m_inlineBuffer;
-    InlineStreamBuffer<LOG_MESSAGE_INLINE_CAPACITY> m_streamBuffer;
+    std::string_view m_fileName;
+    u32 m_line = 0;
+
+    InlineBuffer<LOG_MESSAGE_INLINE_SIZE> m_inlineBuffer;
+    InlineStreamBuffer<LOG_MESSAGE_INLINE_SIZE> m_streamBuffer;
     std::ostream m_stream;
 };
 
 LogLine::LogLine(Logger &logger, LoggerLevel::Level level, u32 line, std::string_view file_name) {
     static_assert(sizeof(Impl) <= LOG_LINE_IMPL_SIZE, "LogLine inline implementation storage is too small");
     static_assert(alignof(Impl) <= alignof(std::max_align_t), "LogLine implementation requires excessive alignment");
-    std::construct_at(reinterpret_cast<Impl *>(m_implStorage), logger, level, line, file_name);
+    std::construct_at(reinterpret_cast<Impl *>(m_impl_storage), logger, level, line, file_name);
 }
 
 LogLine::Impl &LogLine::getImpl() noexcept {
-    return *std::launder(reinterpret_cast<Impl *>(m_implStorage));
+    return *std::launder(reinterpret_cast<Impl *>(m_impl_storage));
 }
 
 LogLine::~LogLine() noexcept {
@@ -68,7 +69,7 @@ void LogPrintf(Logger &logger, LoggerLevel::Level level, u32 line, std::string_v
         return;
     }
 
-    std::array<char, PRINTF_FORMAT_INLINE_CAPACITY> inline_buffer;
+    std::array<char, PRINTF_FORMAT_INLINE_SIZE> inline_buffer;
 
     va_list arguments;
     va_list arguments_copy;

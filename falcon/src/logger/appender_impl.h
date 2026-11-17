@@ -6,15 +6,17 @@
 #include <mutex>
 
 namespace falcon {
+
 class Appender::Impl {
   public:
     virtual ~Impl() = default;
-    void append(LoggerLevel::Level level, std::string_view forrmatted_record) noexcept;
-    void setLevel(LoggerLevel::Level level) noexcept;
-    [[nodiscard]] LoggerLevel::Level getLevel() const noexcept;
 
+    void append(LoggerLevel::Level level, std::string_view forrmatted_record) noexcept;
     void flush();
     void sync();
+
+    void setLevel(LoggerLevel::Level level) noexcept;
+    [[nodiscard]] LoggerLevel::Level getLevel() const noexcept;
 
   protected:
     virtual void writeUnlocked(std::string_view formatted_record) noexcept = 0;

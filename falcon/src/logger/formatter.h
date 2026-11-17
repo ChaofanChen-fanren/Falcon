@@ -9,7 +9,7 @@
 
 namespace falcon::detail {
 
-using FormattedRecordBuffer = InlineBuffer<FORMATTED_RECORD_INLINE_CAPACITY>;
+using FormattedRecordBuffer = InlineBuffer<FORMATTED_RECORD_INLINE_SIZE>;
 
 class Formatter {
   public:
@@ -20,7 +20,13 @@ class Formatter {
     };
 
     explicit Formatter(std::string_view pattern);
+    Formatter(const Formatter &) = delete;
+    Formatter &operator=(const Formatter &) = delete;
+    Formatter(Formatter &&) = default;
+    Formatter &operator=(Formatter &&) = default;
+
     void format(const LogRecordView &record, FormattedRecordBuffer &output) const;
+
     [[nodiscard]] const std::string &getPattern() const noexcept {
         return m_pattern;
     }

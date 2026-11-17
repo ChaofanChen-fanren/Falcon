@@ -14,6 +14,8 @@ namespace falcon {
 Appender::Appender(std::unique_ptr<Impl> impl) noexcept : m_impl(std::move(impl)) {
 }
 
+Appender::~Appender() = default;
+
 void Appender::setLevel(LoggerLevel::Level level) noexcept {
     m_impl->setLevel(level);
 }
@@ -31,11 +33,12 @@ void Appender::sync() {
 }
 
 void Appender::Impl::append(LoggerLevel::Level level, std::string_view formatted_record) noexcept {
+    // Filter records before acquiring the output lock.
     if (static_cast<u8>(level) < static_cast<u8>(getLevel())) {
         return;
     }
 
-    // std::mutex constructor function isn't noexcept
+    // Acquiring the mutex may throw std::system_error.
     try {
         std::lock_guard<std::mutex> lock(m_mutex);
         writeUnlocked(formatted_record);
@@ -43,9 +46,21 @@ void Appender::Impl::append(LoggerLevel::Level level, std::string_view formatted
             flushUnlocked();
         }
     } catch (...) {
-        constexpr std::string_view message = "pans logger: appender operation failed\n";
+        constexpr std::string_view message = "falon logger: appender append operation failed\n";
         std::fwrite(message.data(), 1, message.size(), stderr);
     }
+}
+
+// Flush the backend's user-space output buffer.
+void Appender::Impl::flush() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    flushUnlocked();
+}
+
+// Request file synchronization for file output or flush the stdout stream.
+void Appender::Impl::sync() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    syncUnlocked();
 }
 
 void Appender::Impl::setLevel(LoggerLevel::Level level) noexcept {
@@ -54,18 +69,6 @@ void Appender::Impl::setLevel(LoggerLevel::Level level) noexcept {
 
 LoggerLevel::Level Appender::Impl::getLevel() const noexcept {
     return m_level.load(std::memory_order_acquire);
-}
-
-// io buffer -> os buffer
-void Appender::Impl::flush() {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    flushUnlocked();
-}
-
-// os buffer -> io buffer
-void Appender::Impl::sync() {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    syncUnlocked();
 }
 
 class StdoutAppenderImpl final : public Appender::Impl {
@@ -89,6 +92,7 @@ class FileAppenderImpl final : public Appender::Impl {
         if (file_name.empty()) {
             throw std::invalid_argument("logger file name cannot be empty");
         }
+        // Binary append mode preserves the formatter's bytes, including line endings.
         m_file = std::fopen(file_name.c_str(), "ab");
         if (m_file == nullptr) {
             throw std::system_error(errno, std::generic_category(), "failed to open logger file: " + file_name);
@@ -96,7 +100,6 @@ class FileAppenderImpl final : public Appender::Impl {
     }
     ~FileAppenderImpl() override {
         if (m_file != nullptr) {
-            std::fflush(m_file);
             std::fclose(m_file);
         }
     }
@@ -111,6 +114,7 @@ class FileAppenderImpl final : public Appender::Impl {
     }
 
     void syncUnlocked() noexcept override {
+        // Flush stdio before requesting synchronization of the underlying file.
         flushUnlocked();
 #if defined(_WIN32)
         ::_commit(::_fileno(m_file));

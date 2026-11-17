@@ -12,6 +12,11 @@ class Logger::Impl {
   public:
     explicit Impl(std::string name);
 
+    Impl(const Impl &) = delete;
+    Impl &operator=(const Impl) = delete;
+    Impl(Impl &&) = delete;
+    Impl &operator=(Impl &&) = delete;
+
     [[nodiscard]] bool shouldLog(LoggerLevel::Level level) const noexcept;
 
     void setLevel(LoggerLevel::Level level) noexcept;

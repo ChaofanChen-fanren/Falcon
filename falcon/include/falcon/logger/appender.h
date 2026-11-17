@@ -14,7 +14,7 @@ class AppenderAccess;
 class FALCON_API Appender final {
   public:
     class Impl;
-    ~Appender() = default;
+    ~Appender();
 
     Appender(const Appender &) = delete;
     Appender &operator=(const Appender &) = delete;
@@ -28,9 +28,11 @@ class FALCON_API Appender final {
     void sync();
 
   private:
-    explicit Appender(std::unique_ptr<Impl> impl) noexcept;
     std::unique_ptr<Impl> m_impl;
     friend class detail::AppenderAccess;
+
+  private:
+    explicit Appender(std::unique_ptr<Impl> impl) noexcept;
 };
 
 using AppenderPtr = std::shared_ptr<Appender>;

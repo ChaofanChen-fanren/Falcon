@@ -227,12 +227,17 @@ int Formatter::parse() {
 
         ASSERT_RETVAL_MSG(index + 1 < m_pattern.size(), -1, "logger format pattern ends with an incomplete directive");
         const char directive = m_pattern[++index];
+
+        // parse literal '%' char
         if (directive == '%') {
             literal.push_back('%');
             continue;
         }
 
+        // clear all literal string when parsing directive
         addLiteral(literal);
+
+        // date formate : %d{config-format}.
         std::string_view item_format;
         if (index + 1 < m_pattern.size() && m_pattern[index + 1] == '{') {
             const std::size_t closing_brace = m_pattern.find('}', index + 2);
@@ -241,6 +246,7 @@ int Formatter::parse() {
             item_format = std::string_view(m_pattern).substr(index + 2, closing_brace - index - 2);
             index = closing_brace;
         }
+
         m_items.push_back(CreateFormatItem(directive, item_format));
     }
 
