@@ -40,7 +40,7 @@ LoggerLevel::Level LoggerLevel::FromString(std::string_view value) noexcept {
         return Level::LOGGER_LEVEL_WARNING;
     if (upper_string == "ERROR")
         return Level::LOGGER_LEVEL_ERROR;
-    if (upper_string == "FALTAL")
+    if (upper_string == "FATAL")
         return Level::LOGGER_LEVEL_FATAL;
     if (upper_string == "OFF")
         return Level::LOGGER_LEVEL_OFF;

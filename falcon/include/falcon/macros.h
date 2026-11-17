@@ -33,7 +33,7 @@
     do {                                                                                                               \
         if (!(x)) [[unlikely]] {                                                                                       \
             FALCON_DETAIL_ASSERT_FAIL(#x, "");                                                                         \
-            return (val);                                                                                              \
+            return val;                                                                                                \
         }                                                                                                              \
     } while (0)
 
@@ -41,7 +41,7 @@
     do {                                                                                                               \
         if (!(x)) [[unlikely]] {                                                                                       \
             FALCON_DETAIL_ASSERT_FAIL(#x, "\nMessage: " << msg);                                                       \
-            return (val);                                                                                              \
+            return val;                                                                                                \
         }                                                                                                              \
     } while (0)
 
