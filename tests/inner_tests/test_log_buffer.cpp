@@ -21,7 +21,7 @@ u64 Observe(std::string_view value) noexcept {
 // innnerbuffer
 u64 WriteWithSmallStreamBuffer(std::string_view message) {
     falcon::detail::InlineBuffer<falcon::detail::LOG_MESSAGE_INLINE_CAPACITY> buffer;
-    falcon::detail::SmallStreamBuffer<falcon::detail::LOG_MESSAGE_INLINE_CAPACITY> stream_buffer(buffer);
+    falcon::detail::InlineStreamBuffer<falcon::detail::LOG_MESSAGE_INLINE_CAPACITY> stream_buffer(buffer);
     std::ostream in(&stream_buffer);
     in << message;
     return Observe(buffer.view());

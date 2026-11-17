@@ -1,24 +1,24 @@
-#include <falcon/logger/logger_level.h>
+#include <falcon/logger/level.h>
 #include <iostream>
 
 void test_logger_level() {
     using namespace std;
     using namespace falcon;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_DEBUG) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_INFO) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_WARNING) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_ERROR) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_FATAL) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::Level::LOGGER_LEVEL_OFF) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::DEBUG) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::INFO) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::WARN) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::ERROR) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::FATAL) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::Level::OFF) << endl;
     cout << LoggerLevel::ToString(static_cast<LoggerLevel::Level>(10)) << endl;
 
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("DEBUG")) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("INFO")) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("WARNING")) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("ERROR")) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("FATAL")) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("DBG")) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("INF")) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("WRN")) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("ERR")) << endl;
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("FAT")) << endl;
     cout << LoggerLevel::ToString(LoggerLevel::FromString("OFF")) << endl;
-    cout << LoggerLevel::ToString(LoggerLevel::FromString("UNKNOWN")) << endl; // default OFF
+    cout << LoggerLevel::ToString(LoggerLevel::FromString("UKN")) << endl; // default OFF
 }
 
 int main() {

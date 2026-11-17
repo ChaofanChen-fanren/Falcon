@@ -2,7 +2,7 @@
 #define FALCON_INCLUDE_LOGGER_LOGGER_H
 #include <falcon/export.h>
 #include <falcon/logger/appender.h>
-#include <falcon/logger/logger_level.h>
+#include <falcon/logger/level.h>
 #include <memory>
 #include <string>
 

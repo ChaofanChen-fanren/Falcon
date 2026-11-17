@@ -36,7 +36,7 @@ struct LogLine::Impl final {
     u64 m_fiberId = 0;
     std::string_view m_threadName;
     InlineBuffer<LOG_MESSAGE_INLINE_CAPACITY> m_inlineBuffer;
-    SmallStreamBuffer<LOG_MESSAGE_INLINE_CAPACITY> m_streamBuffer;
+    InlineStreamBuffer<LOG_MESSAGE_INLINE_CAPACITY> m_streamBuffer;
     std::ostream m_stream;
 };
 

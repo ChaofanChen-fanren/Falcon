@@ -10,26 +10,46 @@
 #include <vector>
 
 namespace falcon::detail {
-template <std::size_t INLINE_CAPACITY> class InlineBuffer {
+
+// Stack-allocated buffer with heap fallback.
+// Typical log lines are ~120 bytes, so 250 bytes covers most without heap allocation.
+template <std::size_t STACK_SIZE = 250> class InlineBuffer {
   public:
+    InlineBuffer() = default;
+    InlineBuffer(const InlineBuffer &) = delete;
+    InlineBuffer &operator=(const InlineBuffer &) = delete;
+    InlineBuffer(const InlineBuffer &&other) noexcept : m_heap_storage(std::move(other.m_heap_storage)) {
+        if (other.m_heap) {
+            m_heap = &m_heap_storage;
+        } else {
+            m_size = other.m_size;
+            std::memcpy(m_stack, other.m_stack, m_size);
+        }
+        other.clear();
+    }
+    InlineBuffer &operator=(InlineBuffer &&) = delete;
+
     void append(const char *data, std::size_t size) {
         if (size == 0) {
             return;
         }
 
-        if (m_overflow_string.empty() && (m_size + size <= INLINE_CAPACITY)) {
-            std::memcpy(m_inline_string.data() + m_size, data, size);
+        // already on heap - append directly
+        if (m_heap) {
+            m_heap->append(data, size);
+            return;
+        }
+
+        // fits in stack - memcpy
+        if (m_size + size <= STACK_SIZE) {
+            std::memcpy(m_stack + m_size, data, size);
             m_size += size;
             return;
         }
 
-        if (m_overflow_string.empty()) {
-            const std::size_t required_capacity = m_size + size;
-            m_overflow_string.reserve(std::max(INLINE_CAPACITY * 2, required_capacity));
-            m_overflow_string.insert(m_overflow_string.end(), m_inline_string.data(), m_inline_string.data() + m_size);
-        }
-        m_overflow_string.insert(m_overflow_string.end(), data, data + size);
-        m_size = m_overflow_string.size();
+        // doesn't fit - move stack content to heap, then append
+        spill_to_heap();
+        m_heap->append(data, size);
     }
 
     void append(std::string_view value) {
@@ -41,11 +61,15 @@ template <std::size_t INLINE_CAPACITY> class InlineBuffer {
     }
 
     [[nodiscard]] const char *data() const noexcept {
-        return m_overflow_string.empty() ? m_inline_string.data() : m_overflow_string.data();
+        return m_heap ? m_heap_storage.data() : m_stack;
+    }
+
+    [[nodiscard]] char *data() noexcept {
+        return m_heap ? m_heap_storage.data() : m_stack;
     }
 
     [[nodiscard]] std::size_t size() const noexcept {
-        return m_size;
+        return m_heap ? m_heap_storage.size() : m_size;
     }
 
     [[nodiscard]] std::string_view view() const noexcept {
@@ -53,14 +77,29 @@ template <std::size_t INLINE_CAPACITY> class InlineBuffer {
     }
 
   private:
-    std::array<char, INLINE_CAPACITY> m_inline_string{};
-    std::vector<char> m_overflow_string;
-    std::size_t m_size = 0;
+    void spill_to_heap() {
+        m_heap_storage.assign(m_stack, m_size);
+        m_heap = &m_heap_storage;
+    }
+
+    void clear() {
+        m_size = 0;
+        m_heap = nullptr;
+    }
+
+  private:
+    // stack storage
+    char m_stack[STACK_SIZE];
+    std::size_t m_size{0};
+
+    // heap storage
+    std::string *m_heap{nullptr};
+    std::string m_heap_storage;
 };
 
-template <std::size_t INLINE_CAPACITY> class SmallStreamBuffer final : public std::streambuf {
+template <std::size_t STACK_SIZE> class InlineStreamBuffer final : public std::streambuf {
   public:
-    explicit SmallStreamBuffer(InlineBuffer<INLINE_CAPACITY> &buffer) noexcept : m_buffer(buffer) {
+    explicit InlineStreamBuffer(InlineBuffer<STACK_SIZE> &buffer) noexcept : m_buffer(buffer) {
     }
 
   protected:
@@ -83,7 +122,7 @@ template <std::size_t INLINE_CAPACITY> class SmallStreamBuffer final : public st
     }
 
   private:
-    InlineBuffer<INLINE_CAPACITY> &m_buffer;
+    InlineBuffer<STACK_SIZE> &m_buffer;
 };
 
 } // namespace falcon::detail

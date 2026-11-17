@@ -39,7 +39,7 @@ void Appender::Impl::append(LoggerLevel::Level level, std::string_view formatted
     try {
         std::lock_guard<std::mutex> lock(m_mutex);
         writeUnlocked(formatted_record);
-        if (level == LoggerLevel::Level::LOGGER_LEVEL_FATAL) {
+        if (level == LoggerLevel::Level::FATAL) {
             flushUnlocked();
         }
     } catch (...) {

@@ -34,7 +34,7 @@ class Logger::Impl {
 
   private:
     std::string m_name;
-    std::atomic<LoggerLevel::Level> m_level{LoggerLevel::Level::LOGGER_LEVEL_DEBUG};
+    std::atomic<LoggerLevel::Level> m_level{LoggerLevel::Level::DEBUG};
 
     mutable std::shared_mutex m_mutex;
     std::shared_ptr<const detail::Formatter> m_formatter;

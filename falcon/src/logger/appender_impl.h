@@ -23,7 +23,7 @@ class Appender::Impl {
 
   private:
     std::mutex m_mutex;
-    std::atomic<LoggerLevel::Level> m_level{LoggerLevel::Level::LOGGER_LEVEL_DEBUG};
+    std::atomic<LoggerLevel::Level> m_level{LoggerLevel::Level::DEBUG};
 };
 
 namespace detail {

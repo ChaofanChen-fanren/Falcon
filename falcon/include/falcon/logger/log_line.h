@@ -1,8 +1,8 @@
 #ifndef FALCON_INCLUDE_LOGGER_LOG_LINE_H
 #define FALCON_INCLUDE_LOGGER_LOG_LINE_H
 #include <falcon/export.h>
+#include <falcon/logger/level.h>
 #include <falcon/logger/logger.h>
-#include <falcon/logger/logger_level.h>
 
 namespace falcon::detail {
 class FALCON_API LogLine final {
