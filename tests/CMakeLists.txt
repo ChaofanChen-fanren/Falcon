@@ -11,6 +11,12 @@ if(NOT FALCON_TEST_SOURCES)
     return()
 endif()
 
+# Sort the test sources to ensure consistent build order across different platforms and filesystems.
+list(SORT FALCON_TEST_SOURCES)
+
+# Redefine the __FILE__ macro for each test source file to ensure that the correct relative path is used in the test output.
+redefine_file_macro("${FALCON_TEST_SOURCES}")
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(URCU REQUIRED IMPORTED_TARGET liburcu)
 find_package(Threads REQUIRED)

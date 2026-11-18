@@ -2,7 +2,7 @@ add_library(falcon_options INTERFACE)
 
 target_compile_options(falcon_options INTERFACE
     # Common options for GCC and Clang
-    "$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic;-fno-strict-aliasing>"
+    "$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic;-fno-strict-aliasing;-Wno-builtin-macro-redefined>"
 
     # Position-independent code on Linux
     "$<$<AND:$<PLATFORM_ID:Linux>,$<CXX_COMPILER_ID:GNU,Clang>>:-fPIC>"

@@ -55,6 +55,8 @@ message(STATUS "Cached parallel jobs: ${CMAKE_BUILD_PARALLEL_LEVEL}")
 
 # Common build settings
 include(cmake/falconOptions.cmake)
+include(cmake/falconDependencies.cmake)
+include(cmake/function.cmake)
 
 # Main application
 add_subdirectory(falcon)
@@ -79,3 +81,35 @@ endif()
 if(FALCON_BUILD_TOOLS)
     add_subdirectory(tools)
 endif()
+
+# Install CMake package files under the library directory.
+set(FALCON_INSTALL_CMAKEDIR "${CMAKE_INSTALL_LIBDIR}/cmake/falcon")
+
+# Generate a relocatable package config for find_package().
+configure_package_config_file(
+    cmake/falconConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/falconConfig.cmake"
+    INSTALL_DESTINATION "${FALCON_INSTALL_CMAKEDIR}"
+)
+
+# Generate the version compatibility check for find_package().
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/falconConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/falconConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/falconConfigVersion.cmake"
+    DESTINATION "${FALCON_INSTALL_CMAKEDIR}"
+)
+
+# Make installed targets available as falcon::<target>.
+install(
+    EXPORT falconTargets
+    FILE falconTargets.cmake
+    NAMESPACE falcon::
+    DESTINATION "${FALCON_INSTALL_CMAKEDIR}"
+)
