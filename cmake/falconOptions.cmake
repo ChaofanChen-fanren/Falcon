@@ -19,7 +19,7 @@ target_compile_options(falcon_options INTERFACE
 
 target_compile_definitions(falcon_options INTERFACE
     "$<$<CONFIG:Debug>:FALCON_DEBUG>"
-    "$<$<CONFIG:Release,RelWithDebInfo>:NDEBUG>"
+    "$<$<CONFIG:Release,RelWithDebInfo>:FALCON_NDEBUG>"
 )
 
 target_link_options(falcon_options INTERFACE

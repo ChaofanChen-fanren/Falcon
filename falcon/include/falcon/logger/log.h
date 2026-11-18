@@ -36,29 +36,29 @@ FALCON_API void LogPrintf(Logger &logger, LoggerLevel::Level level, u32 line, st
     } else                                                                                                             \
         falcon::detail::LogLine(*falcon_log_logger, falcon_log_level, __LINE__, __FILE__).stream()
 
-#define FALCON_LOG_DEBUG(logger) FALCON_LOG_LEVEL((logger), falcon::LogLevel::Level::DEBUG)
-#define FALCON_LOG_INFO(logger) FALCON_LOG_LEVEL((logger), falcon::LogLevel::Level::INFO)
-#define FALCON_LOG_WARN(logger) FALCON_LOG_LEVEL((logger), falcon::LogLevel::Level::WARN)
-#define FALCON_LOG_ERROR(logger) FALCON_LOG_LEVEL((logger), falcon::LogLevel::Level::ERROR)
-#define FALCON_LOG_FATAL(logger) FALCON_LOG_LEVEL((logger), falcon::LogLevel::Level::FATAL)
+#define FALCON_LOG_DEBUG(logger) FALCON_LOG_LEVEL((logger), falcon::LoggerLevel::Level::DEBUG)
+#define FALCON_LOG_INFO(logger) FALCON_LOG_LEVEL((logger), falcon::LoggerLevel::Level::INFO)
+#define FALCON_LOG_WARN(logger) FALCON_LOG_LEVEL((logger), falcon::LoggerLevel::Level::WARN)
+#define FALCON_LOG_ERROR(logger) FALCON_LOG_LEVEL((logger), falcon::LoggerLevel::Level::ERROR)
+#define FALCON_LOG_FATAL(logger) FALCON_LOG_LEVEL((logger), falcon::LoggerLevel::Level::FATAL)
 
-#define PANS_LOG_FMT_LEVEL(logger, level, format, ...)                                                                 \
+#define FALCON_LOG_FMT_LEVEL(logger, level, format, ...)                                                               \
     if (auto falcon_log_logger = (logger); !falcon_log_logger) {                                                       \
     } else if (const auto falcon_log_level = (level); !falcon_log_logger->shouldLog(falcon_log_level)) {               \
     } else                                                                                                             \
-        pans::detail::LogPrintf(*falcon_log_logger, falcon_log_level, __LINE__, __FILE__,                              \
-                                (format)__VA_OPT__(, ) __VA_ARGS__)
+        falcon::detail::LogPrintf(*falcon_log_logger, falcon_log_level, __LINE__, __FILE__,                            \
+                                  (format)__VA_OPT__(, ) __VA_ARGS__)
 
 #define FALCON_LOG_FMT_DEBUG(logger, format, ...)                                                                      \
-    FALCON_LOG_FMT_LEVEL((logger), falcon::LogLevel::Level::DEBUG, (format)__VA_OPT__(, ) __VA_ARGS__)
-#define PANS_LOG_FMT_INFO(logger, format, ...)                                                                         \
-    PANS_LOG_FMT_LEVEL((logger), falcon::LogLevel::Level::INFO, (format)__VA_OPT__(, ) __VA_ARGS__)
-#define PANS_LOG_FMT_WARN(logger, format, ...)                                                                         \
-    PANS_LOG_FMT_LEVEL((logger), falcon::LogLevel::Level::WARN, (format)__VA_OPT__(, ) __VA_ARGS__)
-#define PANS_LOG_FMT_ERROR(logger, format, ...)                                                                        \
-    PANS_LOG_FMT_LEVEL((logger), falcon::LogLevel::Level::ERROR, (format)__VA_OPT__(, ) __VA_ARGS__)
-#define PANS_LOG_FMT_FATAL(logger, format, ...)                                                                        \
-    PANS_LOG_FMT_LEVEL((logger), falcon::LogLevel::Level::FATAL, (format)__VA_OPT__(, ) __VA_ARGS__)
+    FALCON_LOG_FMT_LEVEL((logger), falcon::LoggerLevel::Level::DEBUG, (format)__VA_OPT__(, ) __VA_ARGS__)
+#define FALCON_LOG_FMT_INFO(logger, format, ...)                                                                       \
+    FALCON_LOG_FMT_LEVEL((logger), falcon::LoggerLevel::Level::INFO, (format)__VA_OPT__(, ) __VA_ARGS__)
+#define FALCON_LOG_FMT_WARN(logger, format, ...)                                                                       \
+    FALCON_LOG_FMT_LEVEL((logger), falcon::LoggerLevel::Level::WARN, (format)__VA_OPT__(, ) __VA_ARGS__)
+#define FALCON_LOG_FMT_ERROR(logger, format, ...)                                                                      \
+    FALCON_LOG_FMT_LEVEL((logger), falcon::LoggerLevel::Level::ERROR, (format)__VA_OPT__(, ) __VA_ARGS__)
+#define FALCON_LOG_FMT_FATAL(logger, format, ...)                                                                      \
+    FALCON_LOG_FMT_LEVEL((logger), falcon::LoggerLevel::Level::FATAL, (format)__VA_OPT__(, ) __VA_ARGS__)
 
 #define FALCON_LOG_ROOT() falcon::GetRootLogger()
 #define FALCON_LOG_NAME(name) falcon::GetLogger((name))

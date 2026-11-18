@@ -33,3 +33,6 @@ CMakeUserPresets.json
 
 # macOS metadata
 .DS_Store
+
+# demo
+demo/
