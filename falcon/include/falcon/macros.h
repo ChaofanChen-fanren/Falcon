@@ -2,14 +2,16 @@
 #define FALCON_INCLUDE_FALCON_MACROS_H
 
 #include <cassert>
-#include <iostream>
+#include <falcon/logger/log.h>
+#include <falcon/utils/system_utils.h>
 
 // Internal helper: invoke only after the condition has failed.
 // Keep message unparenthesized to support stream expressions such as "fd=" << fd.
 #define FALCON_DETAIL_ASSERT_FAIL(expression, message)                                                                 \
     do {                                                                                                               \
-        std::cerr << "Assertion failed: " << (expression) << "\nLocation: " << __FILE__ << ':' << __LINE__ << message  \
-                  << std::endl;                                                                                        \
+        FALCON_LOG_FATAL(FALCON_LOG_ROOT()) << "Assertion failed: " << (expression) << "\nLocation: " << __FILE__      \
+                                            << ':' << __LINE__ << message << "\nStacktrace:\n"                         \
+                                            << falcon::GetBackTrace();                                                 \
         assert(false && (expression));                                                                                 \
     } while (0)
 
